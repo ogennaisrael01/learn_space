@@ -29,7 +29,7 @@ def send_token_after_account_registration(sender, instance, created, **kwargs):
                 "expires_at": getattr(settings, "OTP_EXPIRY")
             }
             try:
-                send_notification_email(
+                send_notification_email.delay(
                     subject,
                     receiver,
                     template="accounts/otp_email.html",

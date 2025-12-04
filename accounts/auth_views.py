@@ -77,7 +77,7 @@ class ResendOtpView(APIView):
                 subject = otp_serviece[0]
                 context = otp_serviece[1]
 
-                re_send_email = send_notification_email(
+                re_send_email = send_notification_email.delay(
                     subject, 
                     email, 
                     template="accounts/otp_email.html",
@@ -178,7 +178,7 @@ class VerifyOTPView(APIView):
             context = email_service[1]
 
             try:
-                send_notif = send_notification_email(
+                send_notif = send_notification_email.delay(
                     subject, 
                     user.email,
                     template="accounts/verification_email.html",
@@ -298,7 +298,7 @@ class PasswordResetRequestView(APIView):
         context = email_service[1]
 
         try:
-            email_notification = send_notification_email(
+            email_notification = send_notification_email.delay(
                 subject, 
                 user.email,
                 template="accounts/password_reset.html",
