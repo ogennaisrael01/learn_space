@@ -28,18 +28,17 @@ class RateLimitOtpRequestMiddleware:
     """ Rate limit OTP Request within 24 hours timeframe"""
     def __init__(self, get_response):
         self.get_response = get_response
-        self.path = ["api/v1/otp/resend/"]
+        self.path = ["/api/v1/resend/otp/"]
         self.max_request = getattr(settings, "MAX_TRIES_PER_DAY", 3)
-        self.initial_retry = 0
+        self.initial_retry = 1
 
     def __call__(self, request: Request, *args, **kwds):
         # Retrieve the client's IP address from the request metadata
         client_ip = request.META.get("REMOTE_ADDR")
-
         retries_key = f"user_{client_ip}_retries"
         datetime_key = f"user_{client_ip}_timezone" 
 
-        current_date = timezone.now().today()
+        current_date = timezone.now().date()
 
         # Check if a cache entry for the user's retries exists
         if not cache.has_key(retries_key):
@@ -47,15 +46,16 @@ class RateLimitOtpRequestMiddleware:
 
         if not cache.has_key(datetime_key):
             cache.set(datetime_key, current_date, timeout=86400)
-        
-        if request.path in self.path:
+       
+        if request.path in self.path:   
             retry_var = cache.get(retries_key)
             datetime_var = cache.get(datetime_key)
-
-            if retry_var >= self.max_request and current_date <= datetime_var:
+    
+            if retry_var >= self.max_request and current_date == datetime_var:
                 """ if Exceded maximum retry and done with 24 hours time frame. return 403 error"""
                 return HttpResponseForbidden(content="Maximum OTP request Exceeded for today, try again tomorrow")
-            cache.incr(retry_var, 1)
+            
+            cache.incr(retries_key)
                 
         response = self.get_response(request)
         return response

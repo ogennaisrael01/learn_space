@@ -37,4 +37,33 @@ class EmailService:
             if send_email_notif:
                 return {"success": True, "message_to": receiver}
         except Exception as exc:
-            self.retry(exc=exc)
+            return f"Error ocurred {exc}"
+
+    def otp_email(self, user, app_name, expires_at, code):
+        subject = f"OTP Verification [{user}]"
+        context = {
+            "name": user,
+            "app_name": app_name, 
+            "expires_at": expires_at,
+            "code": code
+        }
+
+        return subject, context
+
+    def verify_email(self, user, app_name, login_url):
+        subject = f"Account Verification [{app_name}]"
+        context = {
+            "name": user,
+            "app_name": app_name,
+            "login_url": login_url
+        }
+        return subject, context
+    
+    def password_reset_email(self, user, app_name, reset_url):
+        subject = f"Password Reset [{app_name}]"
+        context = {
+            "name": user,
+            "app_name": app_name,
+            "reset_url": reset_url
+        }
+        return subject, context

@@ -17,12 +17,15 @@ class EmailPhoneUsernameBackend(ModelBackend):
             - if username=email or username=phone or username=username -> True else False
         """
         if hasattr(User, "username") or hasattr(User, "email") or hasattr(User, "phone"):
-            user = User.objects.get(
-                Q(email=username) |
-                Q(phone=username) | 
-                Q(username=username) 
-            )
-            if user.DoesNotExist:
+            if username is None:
+                username = kwargs.get("email")
+            user = User.objects.filter(
+                Q(email__iexact=username) |
+                Q(phone__iexact=username) | 
+                Q(username__iexact=username) 
+            ).first()
+
+            if not user:
                 return HttpResponseNotFound(content={"success": False, "message": f"{username} was not found, try registring an account"})
 
             if user and user.check_password(password):

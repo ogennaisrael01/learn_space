@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email Address</title>
+    <style>
+        /* Basic CSS Reset/Normalize */
+        body, .wrapper {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .content {
+            padding: 20px 0;
+            line-height: 1.6;
+            color: #333;
+        }
+        .button-container {
+            text-align: center;
+            padding-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff; /* Primary brand color */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 15px;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h2>{{ app_name }}</h2>
+            </div>
+            <div class="content">
+                <p>Hello **{{ name }}**,</p>
+                <p>
+                    Thank you for registering an account with {{ app_name }}!
+                </p>
+                <p>
+                    Click this link if you with to log into your account.
+                </p>
+
+                <!-- The 'login_url' must contain the full verification link/token -->
+                <div class="button-container">
+                    <a href="{{ login_url }}" class="button">Verify Email Address</a>
+                </div>
+                
+                <p>
+                    If the button above does not work, you can also copy and paste the following link into your web browser:
+                    <br>
+                    <a href="{{ login_url }}">{{ login_url }}</a>
+                </p>
+                <p>
+                    If you did not create an account, please ignore this email.
+                </p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2025 {{ app_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 import uuid
 from phonenumber_field.modelfields import PhoneNumberField
 
+from . import profile_models
+
 class CustomUserManager(BaseUserManager):
     """ 
         - Manager for handling account creation (CustomUser.objects.create_user(email=...., phone=..., username=..., password=...))
@@ -67,13 +69,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     is_teacher = models.BooleanField(blank=True, null=True)
     is_student = models.BooleanField(blank=True, null=True)
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    black_listed_tokens = models.ManyToManyField("self")
 
 
     objects = CustomUserManager()
@@ -133,3 +135,16 @@ class OTP(models.Model):
     class Meta:
         db_table="otps"
         verbose_name = "otp"
+
+class PasswordReset(models.Model):
+    reset_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, max_length=20, db_index=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="rest_tokens")
+    token = models.CharField(max_length=200, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return f"PasswordReset({self.user.username}, {self.token})"
+    
+    class Meta:
+        db_table = "passwords_resets"
+        ordering = ["-created_at"]

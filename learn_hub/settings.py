@@ -33,7 +33,7 @@ CORS_ALLOWED_ALL_ORIGINS = True
 
 OTP_EXPIRY=env.int("OTP_EXPIRY")
 MAX_TRIES_PER_DAY = env.int("MAX_TRIES_PER_DAY")
-
+BASE_URL = env("BASE_URL")
 APP_NAME=env("APP_NAME")
 
 
@@ -88,13 +88,20 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": True,
     "USER_ID_FIELD": "user_id",
     "USER_ID_CLAIM": "user_id",
     "ALGORITHM": env("ALGORITHM"),
     "SIGNING_KEY": SECRET_KEY,
 
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1"
+    }
 }
 
 MIDDLEWARE = [
@@ -106,7 +113,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'accounts.middlewares.LogRequestMiddleware'
+    'accounts.middlewares.LogRequestMiddleware',
     'accounts.middlewares.RateLimitOtpRequestMiddleware'
 ]
 
