@@ -1,0 +1,3 @@
+Failed to build
+Failed to build Docker daemon
+Failed to build Docker daemon

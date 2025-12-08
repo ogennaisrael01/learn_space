@@ -21,6 +21,9 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG")
 
+# GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID")
+
 ALLOWED_HOSTS = env("ALLOWED_HOST").split(",")
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -187,6 +190,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

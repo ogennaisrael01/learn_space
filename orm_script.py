@@ -19,9 +19,9 @@ User = get_user_model()
 
   
 def run():
-    token = PasswordReset.objects.first()
-    print(token)
-
+    user = User.objects.first()
+    profile = user.student_profile.all()
+    print(profile)
 
 
 if __name__ == "__main__":

@@ -9,13 +9,20 @@ from .auth_views import (
     DeactivateAccountView, 
     AccountUpdateView,
     PasswordResetRequestView,
-    PasswordResetConfirmView
+    PasswordResetConfirmView,
+    GoogleAuthenticationView,
+    RegisterViewTeacher
+)
+from .profile_views import (
+    StudentProfileViewsets
 )
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.routers import DefaultRouter
 
 app_name = "accounts"
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
+    path("register/teacher/", RegisterViewTeacher.as_view(), name="register-teacher"),
     path("resend/otp/", ResendOtpView.as_view(), name="resend-otp"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("login/", LoginView.as_view(), name="login"),
@@ -25,5 +32,12 @@ urlpatterns = [
     path("deactivate/", DeactivateAccountView.as_view(), name="deactivate-account"),
     path("accounts/update/",  AccountUpdateView.as_view(), name="account-update"),
     path("password/reset/request/", PasswordResetRequestView.as_view(), name="password-reset"),
-    path("password/reset/confirm/<token>/", PasswordResetConfirmView.as_view(), name="password-confirm")
+    path("password/reset/confirm/<token>/", PasswordResetConfirmView.as_view(), name="password-confirm"),
+    path("google/auth/", GoogleAuthenticationView.as_view(), name="goole-auth")
 ]
+
+# profile urls
+routers = DefaultRouter()
+
+routers.register(r'profile', StudentProfileViewsets, basename="students")
+

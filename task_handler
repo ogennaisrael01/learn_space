@@ -1,0 +1,61 @@
+#!/bin/bash
+
+working_dir=`pwd`
+project_name='learn_hub'
+
+OPERATIONS=("postgresql" "docker" "redis" "celery_beat")
+if [[ -n $working_dir/manage.py ]]; then
+    for operation in "${OPERATIONS[@]}"; do
+        case "$operation" in
+
+            "postgresql")
+                echo "Starting PostgreSQL..."
+                sudo service postgresql start
+                echo "PostgreSQL started."
+                ;;
+
+            "docker")
+                echo "Starting Docker daemon..."
+                dockerd-rootless.sh --experimental --storage-driver=vfs --iptables=false &
+
+                # Wait for daemon to be ready
+                sleep 3  
+                echo "Docker daemon started."
+
+                echo "Building Docker image..."
+                if docker build --network=host -t learn-space-app:latest . ; then
+                    echo "Build was successfull" >> success.txt
+                else 
+                    echo "Failed to build Docker daemon" >> errors.txt
+                    exit 1
+                fi
+                echo "Docker build completed."
+
+                echo "Running Docker image..."
+                docker run -it learn-space-app:latest
+                ;;
+
+            "redis")
+                echo "Starting Redis..."
+                redis-server &
+                sleep 1
+                ;;
+
+            "celery_beat")
+                echo "Starting Celery Beat..."
+                celery -A "$project_name" beat -l info
+                ;;
+
+            *)
+                echo "Unknown operation: $operation"
+                ;;
+        esac
+    done
+else
+    echo False
+fi
+jobs
+
+wait
+
+echo "All jobs completed"

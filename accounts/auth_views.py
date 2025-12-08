@@ -8,7 +8,8 @@ from .serializers import (
     LogoutSerializer,
     AccountUpdateSerializer,
     PasswordResetRequestSerializer,
-    PasswordResetConfirmSerializer
+    PasswordResetConfirmSerializer,
+    GoogleAuthSerializer
 )
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -26,7 +27,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .permissions import IsOwerOrAdmin
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from  django.db.models import Q
-
+from .google_auth import google_auth
+from rest_framework_simplejwt.tokens import RefreshToken
+from .profile_models import UserRoles
 
 
 APP_NAME = getattr(settings, "APP_NAME", None)
@@ -48,7 +51,11 @@ class RegisterView(APIView):
         
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+        if user:
+            # Set user Role upon registration
+            role = UserRoles(user=user, role=UserRoles.RoleChoices.STUDENT)
+            role.save()
         return Response(data={"message": "registrations successful. verify your account", "success": True
         }, status=201)
 
@@ -351,3 +358,58 @@ class PasswordResetConfirmView(APIView):
                                 "success": True,
                                 "msg": "Password Reset successfull"
                             })
+
+
+class GoogleAuthenticationView(APIView):
+    http_method_names = ["post"]
+    permission_classes = [permissions.AllowAny]
+    serializer_class = GoogleAuthSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        id_token = serializer.validated_data.get("id_token")
+        subs = google_auth(id_token)
+
+        email = subs.get("email")
+        is_verified = subs.get("email_verified")
+        name = subs.get("name")
+
+        if not is_verified:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                "success": False,
+                "message": "Your email isn't verified, verify your account"
+            })
+        
+        user, created = User.objects.get_or_create(email=email)
+        if created:
+            user.set_unusable_password()
+            user.email = email
+            user.first_name = name.split(" ")[0]
+            user.last_name = name.split(" ")[1]
+            user.is_active = True
+            user.is_verified = True
+            user.save()
+        # create refresh and access token for user:
+        refresh = RefreshToken.for_user(user)
+        return Response(status=status.HTTP_200_OK, data={
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "data": {
+                "email": user.email,
+                "pk": user.pk
+            }
+        })
+
+        
+class RegisterViewTeacher(RegisterView):
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        if user:
+            role = UserRoles(user=user, role=UserRoles.RoleChoices.TEACHER)
+            role.save()
+        return Response(data={"message": "registrations successful. verify your account", "success": True
+        }, status=201)

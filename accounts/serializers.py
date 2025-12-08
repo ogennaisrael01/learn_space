@@ -251,3 +251,14 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Password mismatch"))
         
         return attrs
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    id_token = serializers.CharField(required=True, write_only=True)
+
+    def validate_id_token(self, value):
+        if value is None:
+            raise serializers.ValidationError(_("Id token cannot be blank when registring with google"))
+        
+        value.strip()
+        return value
