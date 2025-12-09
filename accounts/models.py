@@ -138,7 +138,7 @@ class OTP(models.Model):
 
 class PasswordReset(models.Model):
     reset_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, max_length=20, db_index=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="rest_tokens")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="reset_tokens")
     token = models.CharField(max_length=200, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 

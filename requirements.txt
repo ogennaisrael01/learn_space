@@ -1,4 +1,4 @@
-amqp==5.2.0
+amqp==5.3.1
 asgiref==3.11.0
 billiard==4.2.4
 cachetools==6.2.2
@@ -45,7 +45,6 @@ pyyaml==6.0.3
 redis==7.1.0
 requests==2.32.5
 rsa==4.9.1
-simplejson==3.20.2
 six==1.17.0
 sqlparse==0.5.4
 tzdata==2025.2

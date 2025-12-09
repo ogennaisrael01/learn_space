@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from .auth_views import (
     RegisterView, 
@@ -14,7 +14,8 @@ from .auth_views import (
     RegisterViewTeacher
 )
 from .profile_views import (
-    StudentProfileViewsets
+    StudentProfileViewsets,
+    TeacherProfileViewsets
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
@@ -38,6 +39,10 @@ urlpatterns = [
 
 # profile urls
 routers = DefaultRouter()
+routers.register(r'students', StudentProfileViewsets, basename="students")
+routers.register(r"teachers", TeacherProfileViewsets, basename="teachers")
 
-routers.register(r'profile', StudentProfileViewsets, basename="students")
+urlpatterns += [
+    path("profile/", include(routers.urls), name="profiles")
+]
 

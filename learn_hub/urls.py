@@ -28,12 +28,13 @@ urlpatterns = [
 
     # APIs and Routes
     path("api/v1/accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("", include("rest_framework.urls"))
 ]
 
 
 urlpatterns += [
     path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-documentation"),
-    path("redocs/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-documentation"),
+    path("re_docs/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-documentation"),
 ]
 
 if settings.DEBUG:

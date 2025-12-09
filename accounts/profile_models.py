@@ -17,12 +17,9 @@ class StudentProfile(models.Model):
     guardians = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def get_username_or_email(self):
-        return self.user.username if self.user.username else self.user.email 
     
     def __str__(self):
-        return f"StudentProfile({self.get_username_or_email},)"
+        return f"StudentProfile({self.user.username},)"
 
 
     class Meta:
@@ -53,6 +50,10 @@ class TeacherProfile(models.Model):
     class Meta:
         db_table = "teacher_profile"
         verbose_name = "teacher"
+
+    def subjects(self):
+        user_subjects = self.subjects.split(",")
+        return [subj.strip() for subj in user_subjects]
 
 class UserRoles(models.Model):
     class RoleChoices(models.TextChoices):
@@ -93,7 +94,7 @@ class Certificates(models.Model):
         default=uuid.uuid4,
         unique=True
     )
-
+    name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="certificates")
     description = models.TextField()
     certificate_uri = models.ImageField(upload_to="certificates/")

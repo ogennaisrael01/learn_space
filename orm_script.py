@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from accounts.models import PasswordReset
+from accounts.profile_models import StudentProfile
 
 User = get_user_model()
 
@@ -20,8 +21,7 @@ User = get_user_model()
   
 def run():
     user = User.objects.first()
-    profile = user.student_profile.all()
-    print(profile)
+    user.delete()
 
 
 if __name__ == "__main__":

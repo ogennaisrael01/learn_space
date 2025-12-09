@@ -51,11 +51,7 @@ class RegisterView(APIView):
         
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        if user:
-            # Set user Role upon registration
-            role = UserRoles(user=user, role=UserRoles.RoleChoices.STUDENT)
-            role.save()
+        serializer.save()
         return Response(data={"message": "registrations successful. verify your account", "success": True
         }, status=201)
 
@@ -116,8 +112,8 @@ class ResendOtpView(APIView):
                     template="accounts/otp_email.html",
                     context=context
                 )
-                if re_send_email.get("success"):
-                    return Response(data={"success": True, "message": "OTP sent successfully"}, status=200)
+               
+                return Response(data={"success": True, "message": "OTP sent successfully"}, status=200)
 
         except Exception as e:
             return Response(
@@ -198,8 +194,8 @@ class VerifyOTPView(APIView):
                                     "success": False,
                                     "message": f"Error occured which sending account verification email: {exc}"
                                 })  
-            if send_notif.get("success"):
-                return Response(status=status.HTTP_200_OK,
+            
+            return Response(status=status.HTTP_200_OK,
                                 data={
                                     "success": True,
                                     "msg": "Account verification successful. access guaranteed"
@@ -317,12 +313,12 @@ class PasswordResetRequestView(APIView):
                                 "success": False,
                                 "msg": f"error occured while sending email for password reset: {exc}"
                             })
-        if email_notification.get("success"):
-            return Response(status=status.HTTP_200_OK,
-                            data={
-                                "success": True,
-                                "msg": "Reset password link sent to your inbox"
-                            })
+
+        return Response(status=status.HTTP_200_OK,
+                        data={
+                            "success": True,
+                            "msg": "Reset password link sent to your inbox"
+                        })
 
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -408,8 +404,5 @@ class RegisterViewTeacher(RegisterView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        if user:
-            role = UserRoles(user=user, role=UserRoles.RoleChoices.TEACHER)
-            role.save()
         return Response(data={"message": "registrations successful. verify your account", "success": True
         }, status=201)

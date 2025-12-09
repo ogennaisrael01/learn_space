@@ -31,7 +31,8 @@ class EmailPhoneUsernameBackend(ModelBackend):
             if user and user.check_password(password):
                 return user
 
-        return False
+        return HttpResponseNotFound(content={"success": False,
+                                            "msg": "Faild to connect"})
     
     def  get_user(self, user_id):
         if user_id is None:
@@ -40,5 +41,5 @@ class EmailPhoneUsernameBackend(ModelBackend):
             user = get_object_or_404(User, pk=user_id)
         except User.DoesNotExist:
             return None
-        return user if user.is_active == True and user.is_deleted==False else None
+        return user
             

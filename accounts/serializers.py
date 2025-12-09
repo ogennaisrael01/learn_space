@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db.models import Q
+from .profile_models import UserRoles
 
 User = get_user_model()
 class RegistrationSerializer(serializers.Serializer):
@@ -27,6 +28,8 @@ class RegistrationSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=200)
     middle_name = serializers.CharField(max_length=200)
     last_name = serializers.CharField(max_length=200)
+    is_student = serializers.BooleanField()
+    is_teacher = serializers.BooleanField()
 
     def validate_password(self, value):
         """" Validate and return passwoed using the built in validation function"""
@@ -70,7 +73,28 @@ class RegistrationSerializer(serializers.Serializer):
         return username
     
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        is_teacher = validated_data.get("is_teacher")
+        is_student = validated_data.get("is_student")
+        password = validated_data.get("password")
+        user = User(**validated_data)
+        role = None
+        try:
+            if is_teacher:
+                role = UserRoles(user=user, role=UserRoles.RoleChoices.TEACHER)
+            elif is_student:
+                role = UserRoles(user=user, role=UserRoles.RoleChoices.STUDENT)
+        except Exception as e:
+            raise serializers.ValidationError(_(f"Errror while saving user instance: {e}"))
+        # Save user role
+        role.save()
+        user.set_password(password)
+        user.save()
+        return user
+
+    
+        
+
+        
         return user
 
 
@@ -262,3 +286,22 @@ class GoogleAuthSerializer(serializers.Serializer):
         
         value.strip()
         return value
+
+class UserOutSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    class Meta:
+        model = User
+        fields = [
+            "user_id", 
+            "email",
+            "phone",
+            "username",
+            "full_name",
+            "is_teacher",
+            "is_student",
+            "is_verified",
+            'created_at'
+            ]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()

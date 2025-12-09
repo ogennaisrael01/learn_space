@@ -74,14 +74,14 @@ INSTALLED_APPS = [
 
 
 AUTHENTICATION_BACKENDS = [
-    "accounts.auth_backends.EmailPhoneUsernameBackend",
+    # "accounts.auth_backends.EmailPhoneUsernameBackend",
     'django.contrib.auth.backends.ModelBackend'
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication"
-    ],
+    # "DEFAULT_AUTHENTICATION_CLASSES": [
+    #     "rest_framework_simplejwt.authentication.JWTAuthentication"
+    # ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
     ]
@@ -150,10 +150,9 @@ DATABASES = {
         "USER": env("POSTGRES_USER"),
         "PASSWORD": env("POSTGRES_PASSWORD"),
         "PORT": env("DATABASE_PORT"),
-        "HOST": env("DATABASE_HOST")
+        "HOST": env("DATABASE_HOST"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -220,26 +219,26 @@ timezone = 'Africa/Lagos'
 
 
 
-LOGGING = {
-    "version": 1,
-    "handlers": {
-        "request_file": {
-            "class": "logging.FileHandler",
-            "filename": BASE_DIR / "request_log.log",
-            "level": "INFO",
-            "formatter": "simple",
-        }
-    },
-    "formatters": {
-        "simple": {
-            "format": "%(asctime)s %(levelname)s %(message)s"
-        }
-    },
-    "loggers": {
-        "request_logger": {
-            "handlers": ["request_file"],
-            "level": "INFO",
-            "propagate": False,
-        }
-    }
-}
+# LOGGING = {
+#     "version": 1,
+#     "handlers": {
+#         "request_file": {
+#             "class": "logging.FileHandler",
+#             "filename": BASE_DIR / "request_log.log",
+#             "level": "INFO",
+#             "formatter": "simple",
+#         }
+#     },
+#     "formatters": {
+#         "simple": {
+#             "format": "%(asctime)s %(levelname)s %(message)s"
+#         }
+#     },
+#     "loggers": {
+#         "request_logger": {
+#             "handlers": ["request_file"],
+#             "level": "INFO",
+#             "propagate": False,
+#         }
+#     }
+# }

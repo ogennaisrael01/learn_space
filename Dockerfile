@@ -1,9 +1,12 @@
 # Builder Stage
-FROM python:3.11-slim-bookworm AS builder
+FROM python:3.12.3-slim AS builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y netcat-openbsd
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf \
+    && apt-get update \
+    && apt-get install -y curl
+
 
 COPY . .
 

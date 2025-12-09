@@ -9,16 +9,10 @@ services:
       POSTGRES_DB: ${POSTGRES_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     restart: unless-stopped
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     env_file:
       - .env
-    networks:
-      - backend
+    network_mode: "host"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
@@ -26,33 +20,18 @@ services:
 
   redis:
     image: redis:latest
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     container_name: redis_server
     restart: unless-stopped
-    networks:
-      - backend
+    network_mode: "host"
 
   web:
     build: .
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     container_name: learn-space-app
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     volumes:
       - .:/app
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - backend
+    network_mode: "host"
     env_file:
       - .env
     healthcheck:
@@ -62,51 +41,27 @@ services:
       retries: 5
       start_period: 10s
 
-
   celery_worker:
     build: .
     container_name: celery_worker
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     command: ["celery", "-A", "learn_hub", "worker", "--loglevel=info"]
     restart: unless-stopped
     volumes:
       - .:/app
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - backend
-    command: celery -A learn_hub worker --loglevel=info
+    network_mode: "host"
     env_file:
       - .env
 
   celery_beat:
     build: .
     container_name: celery_beat
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     command: ["celery", "-A", "learn_hub", "beat", "--loglevel=info"]
     restart: unless-stopped
     volumes:
       - .:/app
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - backend
-    command: celery -A learn_hub beat --loglevel=info
+    network_mode: "host"
     env_file:
       - .env
 
 volumes:
   postgres_data:
-
-networks:
-  backend:
