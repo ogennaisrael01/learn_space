@@ -1,0 +1,4 @@
+{
+    "success": false,
+    "msg": "Error while retrieving profile : Got AttributeError when attempting to get a value for field `description` on serializer `CertificateSerializer`.\nThe serializer field might be named incorrectly and not match any attribute or key on the `RelatedManager` instance.\nOriginal exception text was: 'RelatedManager' object has no attribute 'description'."
+}

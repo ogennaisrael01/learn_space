@@ -398,11 +398,3 @@ class GoogleAuthenticationView(APIView):
             }
         })
 
-        
-class RegisterViewTeacher(RegisterView):
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(data={"message": "registrations successful. verify your account", "success": True
-        }, status=201)

@@ -1,16 +1,56 @@
 from rest_framework import serializers
-from .profile_models import StudentProfile, User, TeacherProfile
+from .profile_models import StudentProfile, User, TeacherProfile, Certificates, ProfileAvater
 from .serializers import UserOutSerializer
+from django.utils import timezone
+from .serializers import _
+
+class AvaterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileAvater
+        fields = [
+            "avater_id",
+            "avater_uri",
+            "created_at"
+        ]
+
+class CertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certificates
+        fields = [
+            "certificate_id",
+            "name",
+            "description",
+            "certificate_uri",
+            "issued_on",
+            "created_at"
+        ]
+        read_only_fields = ["certificate_id", "created_at"]
+    
+    def validate_name(self, value: str):
+        if value:
+            value.title()
+        return value
+    
+
+    def validate_issued_on(self, value):
+        today = timezone.now().date()
+        """ Ensure the the issue data is not greater than today"""
+        if value > today:
+            raise serializers.ValidationError(_("Issued date can't be greatet than today"))
+        
+        return value
+        
 
 class StudentProfileSerializerCreate(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = ["bio", "contact_number", "social_links", "guardians"]
 
-
 class StudentProfileSerializerOut(serializers.ModelSerializer):
-    certificates = serializers.SerializerMethodField()
+    certificates = CertificateSerializer(source="user.certificates", read_only=True, many=True)
     user = UserOutSerializer()
+    avater = AvaterSerializer(source="user.avater", read_only=True)
+     
 
     class Meta:
         model = StudentProfile
@@ -24,22 +64,7 @@ class StudentProfileSerializerOut(serializers.ModelSerializer):
             "social_links",
             "created_at",
             "certificates",
-        ]
-
-    def get_certificates(self, obj):
-        certifications = obj.user.certificates.all()
-
-        if not certifications.exists():
-            return None
-
-        return [
-            {
-                "name": certificate.name,
-                "description": certificate.description,
-                "certificate": certificate.certificate_uri,
-                "issued_on": certificate.issued_on,
-            }
-            for certificate in certifications
+            "avater"
         ]
 
 class TeacherProfileCreate(serializers.ModelSerializer):
@@ -54,7 +79,9 @@ class TeacherProfileCreate(serializers.ModelSerializer):
 
 class TeacherProfileOut(serializers.ModelSerializer):
     subjects = serializers.SerializerMethodField()
-    user = UserOutSerializer(read_only=True)
+    certificates = CertificateSerializer(source="user.certificates", read_only=True, many=True)
+    user = UserOutSerializer()
+    avater = AvaterSerializer(source="user.avater", read_only=True)
     class Meta:
         model = TeacherProfile
         fields = [
@@ -63,8 +90,12 @@ class TeacherProfileOut(serializers.ModelSerializer):
             "subjects",
             "created_at",
             "contact_number",
-            "social_links"
+            "social_links",
+            "certificates",
+            "avater"
         ]
     
     def get_subjects(self, obj):
         return obj.subjects()
+
+

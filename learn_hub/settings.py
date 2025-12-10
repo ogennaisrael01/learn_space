@@ -61,6 +61,7 @@ INSTALLED_APPS = [
 
     # my local apps
     "accounts.apps.AccountsConfig",
+    "app_classroom.apps.AppClassroomConfig",
 
 
     # THird party apps

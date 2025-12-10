@@ -27,7 +27,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # APIs and Routes
-    path("api/v1/accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("api/v1/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("api/v1/", include("app_classroom.urls"), name="classroom"),
     path("", include("rest_framework.urls"))
 ]
 

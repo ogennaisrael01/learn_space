@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ app_name }} - Your Classroom Invite Code</title>
+
+    <style>
+        body {
+            background-color: #f4f4f7;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            padding: 40px 0;
+            background-color: #f4f4f7;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .code-box {
+            background: #e7f0ff;
+            border-left: 4px solid #3d6bff;
+            padding: 15px;
+            font-size: 26px;
+            letter-spacing: 3px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="email-wrapper">
+        <div class="email-container">
+
+            <h1>Your Classroom Invite Code</h1>
+
+            <p>Hello <strong>{{ email }}</strong>,</p>
+
+            <p>
+                A new classroom has been created for you on <strong>{{ app_name }}</strong>.
+                Below is the unique invitation code for your classroom.
+            </p>
+
+            <div class="code-box">
+                {{ code }}
+            </div>
+
+            <p>
+                Share this code with your students so they can join your classroom.  
+                Keep the code secure and avoid sharing it publicly.
+            </p>
+
+            <p>
+                If you did not create this classroom or believe this message was sent in error,
+                please disregard it.
+            </p>
+
+            <div class="footer">
+                &copy; {{ app_name }} — All rights reserved.
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
