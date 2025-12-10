@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .utils.email_service import EmailService
 from accounts.utils.tasks import send_notification_email
 from django.conf import settings
+from django.db import transaction
 
 app_name = getattr(settings, "APP_NAME")
 
@@ -17,6 +18,7 @@ class SendInviteView(APIView):
     def get_queryset(self):
         return Classroom.objects.select_related("invite_code")
     
+    @transaction.atomic()
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

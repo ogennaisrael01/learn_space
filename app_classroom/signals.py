@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from .models import Classroom
+from .models import Classroom, ClassroomMembership
 from accounts.utils.tasks import send_notification_email
 from .utils.email_service import EmailService
 from django.conf import settings
@@ -28,5 +28,14 @@ def invite_code(sender, instance, created, *args, **kwargs):
             )
         except Exception as exc:
             raise exc
-        
+
+@receiver(post_save, sender=Classroom)
+def class_membershio(sender, instance, created, **kwargs):
+        """ Create classroom membership for the teacher after classroom is created """
+        if isinstance(instance, Classroom) and created:
+            user = instance.teacher
+            membership = ClassroomMembership(user=user, classroom=instance, role=ClassroomMembership.RoleChoices.TEACHER)
+            membership.save()
+            
+
  
