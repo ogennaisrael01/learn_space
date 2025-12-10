@@ -47,4 +47,14 @@ class SendInviteSerializer(serializers.Serializer):
 
     def validate_code(self, value):
         return value.strip()
-    
+
+class ClassRoomInviteSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        email = value.strip()
+        try:
+            valid_email = email_validator.validate_email(email, check_deliverability=True)
+        except Exception as exc:
+            raise serializers.ValidationError(_(f"Error while validating email address: {exc}"))
+        return valid_email.normalized

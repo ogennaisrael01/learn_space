@@ -1,9 +1,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from .models import Classroom, ClassroomMembership
+from .models import Classroom, ClassroomMembership, ClassroomInvite
 from accounts.utils.tasks import send_notification_email
 from .utils.email_service import EmailService
 from django.conf import settings
+from django.utils.crypto import get_random_string
 
 app_name =  getattr(settings, "APP_NAME")
 
@@ -30,12 +31,19 @@ def invite_code(sender, instance, created, *args, **kwargs):
             raise exc
 
 @receiver(post_save, sender=Classroom)
-def class_membershio(sender, instance, created, **kwargs):
+def class_membership(sender, instance, created, **kwargs):
         """ Create classroom membership for the teacher after classroom is created """
         if isinstance(instance, Classroom) and created:
             user = instance.teacher
             membership = ClassroomMembership(user=user, classroom=instance, role=ClassroomMembership.RoleChoices.TEACHER)
             membership.save()
             
+@receiver(post_save, sender=Classroom)
+def classroom_invite(sender, instance, created, **kwargs):
+     if created:
+          random_string = get_random_string(length=18)
+          invite = ClassroomInvite(classroom=instance, token=random_string)
+          invite.save()
+
 
  

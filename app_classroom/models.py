@@ -62,7 +62,7 @@ class ClassroomMembership(models.Model):
     class Meta:
         db_table = "classroom_membership"
         constraints = [
-            models.UniqueConstraint(fields=("user", "classroom"))
+            models.UniqueConstraint(fields=("user", "classroom"), name="unique_user_classroom")
         ]
     
     def __str__(self):
@@ -70,11 +70,11 @@ class ClassroomMembership(models.Model):
 
 class  ClassroomInvite(models.Model):
     classroom_invite_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=20)
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, ralated_name="invites")
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="invites")
     email= models.EmailField()
     invited_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invites")
     accepted = models.BooleanField(default=False)
-    token = models.CharField(max_length=100, unique=True, editable=False)
+    token = models.CharField(max_length=100, unique=True, editable=False) # Unique token class Invitation(class teachers only)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
