@@ -8,8 +8,8 @@ class Classroom(models.Model):
     class_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=20)
     
     # class room members
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="classroom", help_text="Classroom supervisor")
-    students = models.ManyToManyField(User, related_name="classroom_memebers", help_text="class room members")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="classroom", help_text="classroom_supervisor")
+    students = models.ManyToManyField(User, related_name="classroom_memebers", help_text="class_room_members")
 
     # Class Info
     name = models.CharField(max_length=255)
@@ -85,7 +85,7 @@ class  ClassroomInvite(models.Model):
     class Meta:
         db_table = "classroom_invite"
         indexes = [
-            models.Index(fields=["email"], name="email_idx"),
+            models.Index(fields=["email"], name="email_idx_class_invite"),
             models.Index(fields=["accepted"], name="accepted_idx"),
         ]
 

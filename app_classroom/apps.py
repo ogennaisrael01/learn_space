@@ -7,4 +7,4 @@ class AppClassroomConfig(AppConfig):
 
 
     def ready(self):
-        import app_classroom.signals
+        from . import signals

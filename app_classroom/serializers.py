@@ -20,11 +20,9 @@ class ClassroomCreateSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        name = validated_data.get("name")
-
-        # get invite code for 
-        invite = invite_code(name).strip()
-        if not invite_code:
+        # get invite random access invite code for the object
+        invite = invite_code()
+        if not invite:
             raise serializers.ValidationError(_("Error Creating class invite code"))
         
         classroom = Classroom(**validated_data)
@@ -58,3 +56,12 @@ class ClassRoomInviteSerializer(serializers.Serializer):
         except Exception as exc:
             raise serializers.ValidationError(_(f"Error while validating email address: {exc}"))
         return valid_email.normalized
+    
+class JoinClassViaCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(required=True,
+                                error_messages={
+                                    "required": _("Please provide you access code")
+                                })
+
+    def validate_code(self, value):
+        return value.strip()
