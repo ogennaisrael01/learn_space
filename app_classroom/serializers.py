@@ -65,3 +65,7 @@ class JoinClassViaCodeSerializer(serializers.Serializer):
 
     def validate_code(self, value):
         return value.strip()
+
+class JoinRequestSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=1000)
+    

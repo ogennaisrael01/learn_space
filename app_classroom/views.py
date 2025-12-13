@@ -3,7 +3,8 @@ from .serializers import (
     SendInviteSerializer, 
     ClassRoomInviteSerializer, 
     ClassroomCreateSerializer,
-    JoinClassViaCodeSerializer
+    JoinClassViaCodeSerializer,
+    JoinRequestSerializer
 )
 from .models import Classroom, ClassroomInvite, ClassroomMembership
 from rest_framework import status, permissions, viewsets
@@ -259,3 +260,20 @@ class JoinClasViaCodeView(APIView):
                                 "msg": "You have successfully joined the class"
                             })
         
+class JoinRequestView(APIView):
+    serializer_class = JoinRequestSerializer
+    permission_classes = []
+    http_method_names = ["post"]
+
+    def get_object(self):
+        classroom_id = self.kwargs.get("classroom_id")
+        return get_object_or_404(Classroom, class_id=classroom_id)
+    
+
+    def post(self,request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        classroom = self.get_object()
+        class_supervisor = classroom.teacher
+         # continue
