@@ -31,3 +31,22 @@ class EmailService:
             "username": username
         }
         return subject, context
+    
+    def send_request_email(self, classroom, app_name, username):
+        subject = f"Request to join {classroom} - {app_name}"
+        context = {
+            "classroom": classroom,
+            "app_name": app_name,
+            "username": username
+        }
+        return subject, context
+
+    def accept_join_request_email(self, user, accepted_by, app_name, classroom):
+        subject = f"Request Accepted {classroom} - {app_name}"
+        context = {
+            "user": user,
+            "accepted_by": accepted_by,
+            "classroom": classroom,
+            "app_name": app_name
+        }
+        return subejct, context

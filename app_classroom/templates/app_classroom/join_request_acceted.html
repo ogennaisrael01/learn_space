@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ app_name }} | Request Accepted</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 60px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        p {
+            color: #555555;
+            line-height: 1.6;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #333333;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Request Accepted</h2>
+
+        <p>
+            Hello <span class="highlight">{{ user }}</span>,
+        </p>
+
+        <p>
+            Your request to join the classroom
+            <span class="highlight">{{ classroom }}</span>
+            has been accepted by
+            <span class="highlight">{{ accepted_by }}</span>.
+        </p>
+
+        <p>
+            You now have access to the classroom and can begin participating immediately.
+        </p>
+
+        <div class="footer">
+            <p>
+                This notification was sent by {{ app_name }}.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -289,7 +289,7 @@ class PasswordResetRequestView(APIView):
         reset_model.save()
 
         print(token)
-        reset_url = BASE_URL + f"/api/v1/accounts/password/reset/confirm/{token}/"
+        reset_url = BASE_URL + f"/api/v1/auth/password/reset/confirm/{token}/"
 
         # send password reset email 
 

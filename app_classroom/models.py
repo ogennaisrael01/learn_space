@@ -106,9 +106,10 @@ class JoinRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"JoinRequest({self.user.username}, {self.classroom.name}, {self.status})"
+        return f"JoinRequest({self.user.email}, {self.classroom.name}, {self.status})"
 
     class Meta:
+        ordering = ["-created_at"]
         db_table = "join_request"
         constraints = [
             models.UniqueConstraint(fields=("user", "classroom"), name="unique_user_classroom_request")
