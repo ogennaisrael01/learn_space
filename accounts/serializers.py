@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db.models import Q
+from .profile_models import StudentProfile, TeacherProfile
 
 
 User = get_user_model()
@@ -313,18 +314,27 @@ class OnboadingSerializer(serializers.Serializer):
                 raise serializers.ValidationError("User dosen't have the is_student field, contact support")
 
             setattr(user, "is_student", True)
+            profile = StudentProfile(user=user)
+
         elif role == self.role_choices[1]:
             if not hasattr(user, "is_teacher"):
                 raise serializers.ValidationError("User dosen't have the is_teacher field, contact support")
 
             setattr(user, "is_teacher", True)
-
+            profile = TeacherProfile(user=user)
         elif role == self.role_choices[2]:
             if not hasattr(user, "is_student") and not hasattr(user, "is_teacher"):
                 raise serializers.ValidationError("User is not capable of becoming both student and teacher at the same time")
 
             setattr(user, "is_teacher", True)
             setattr(user, "is_student", True)
+            student_profile = StudentProfile(user=user)
+            teacher_profile = TeacherProfile(user=user)
+
+
+            student_profile.save()
+
+            teacher_profile.save()
 
         else:
             raise serializers.ValidationError("Invalid request.", code=400)
@@ -333,6 +343,8 @@ class OnboadingSerializer(serializers.Serializer):
             role = self.role_choices[0]
 
         setattr(user, "active_role", role.upper())
+
+        profile.save()
         user.save()
 
         return user
