@@ -5,7 +5,7 @@ from django.conf import settings
 from .utils.otp import otp_token
 from .models import OTP
 from .utils.tasks import send_notification_email
-from .profile_models import UserRoles, StudentProfile, TeacherProfile
+from .profile_models import StudentProfile, TeacherProfile
 
 User=get_user_model()
 @receiver(post_save, sender=User)
@@ -40,23 +40,5 @@ def send_token_after_account_registration(sender, instance, created, **kwargs):
                 print("Failed")
                 return {"success": False, "message": "Failed to send mail"}
 
-@receiver(post_save, sender=User)
-def save_profile_after_account_registration(
-    sender, 
-    instance, 
-    created, 
-    **kwargs):
-    """"
-    Create or save user profile after user account is created. 
-    - Detect both teacher and student profiles
-    """
-    if created:
-        try:
-            user_role = UserRoles.objects.get(user=instance)
-            if user_role.role == UserRoles.RoleChoices.STUDENT:
-                StudentProfile.objects.create(user=instance)
-            elif user_role.role == UserRoles.RoleChoices.TEACHER:
-                TeacherProfile.objects.create(user=instance)
-        except UserRoles.DoesNotExist:
-            return {"success": False, "msg": "Error saving profile"}
+
 

@@ -9,7 +9,9 @@ from .serializers import (
     AccountUpdateSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
-    GoogleAuthSerializer
+    GoogleAuthSerializer,
+    OnboadingSerializer,
+    SwitchRoleSerializer
 )
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -29,7 +31,6 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from  django.db.models import Q
 from .google_auth import google_auth
 from rest_framework_simplejwt.tokens import RefreshToken
-from .profile_models import UserRoles
 
 
 APP_NAME = getattr(settings, "APP_NAME", None)
@@ -398,3 +399,56 @@ class GoogleAuthenticationView(APIView):
             }
         })
 
+class OnboardingView(APIView):
+    http_method_names = ["post"]
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OnboadingSerializer
+
+    def post(self, request, *args, **kwargs):
+
+
+        if request.user.active_role:
+            return Response(data={
+                "detail": "role already set",
+                "status": "success"
+            }, status=status.HTTP_200_OK)
+        
+        serializer = self.serializer_class(data=request.data, context={
+            "request": request
+        })
+
+        serializer.is_valid(raise_exception=True)
+        
+        serializer.save()
+
+        return Response(data={
+            "detail": "Role activated",
+            "active-role": request.user.active_role
+        })
+
+class SwitchRoleView(APIView):
+    http_method_names = ["post"]
+
+    serializer_class = SwitchRoleSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.serializer_class(
+            data=request.data,
+            context={
+                "request": request
+            }
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+
+        return Response(data={
+            "detail": "role updated",
+            "active role": request.user.active_role
+        }, status=status.HTTP_200_OK)
+
+    

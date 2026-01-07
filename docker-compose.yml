@@ -12,7 +12,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    network_mode: "host"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
@@ -21,34 +20,47 @@ services:
   redis:
     image: redis:latest
     container_name: redis_server
+    ports:
+      - "5379:5379"
+    volumes:
+      - redis_data:/data
     restart: unless-stopped
-    network_mode: "host"
+    command: redis-server --appendonly yes
+
+  adminer:
+    image: adminer:standalone
+    container_name: adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
 
   web:
     build: .
     container_name: learn-space-app
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: >
+      sh -c "chmod +x ./entry_point && ./entry_point"
     restart: unless-stopped
     volumes:
       - .:/app
-    network_mode: "host"
+
+    depends_on:
+      - redis
+      - db
+    
+    ports:
+      - "8000:8000"
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    
 
   celery_worker:
     build: .
     container_name: celery_worker
     command: ["celery", "-A", "learn_hub", "worker", "--loglevel=info"]
     restart: unless-stopped
-    volumes:
-      - .:/app
-    network_mode: "host"
+    depends_on:
+      - redis
     env_file:
       - .env
 
@@ -57,11 +69,11 @@ services:
     container_name: celery_beat
     command: ["celery", "-A", "learn_hub", "beat", "--loglevel=info"]
     restart: unless-stopped
-    volumes:
-      - .:/app
-    network_mode: "host"
+    depends_on:
+      - redis
     env_file:
       - .env
 
 volumes:
   postgres_data:
+  redis_data:

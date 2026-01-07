@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 from accounts.models import OTP
 import logging
+from django.db.utils import ProgrammingError
 
 logger =logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ def send_notification_email(*args, **kwargs):
     email_service = email.send_email(*args, **kwargs)  
     return email_service
 
-@shared_task
+@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=30, retry_kwargs={"max_retries": 5})
 def expire_otp():
     try:
         logger.info("Scheduled task running......")
@@ -33,6 +34,9 @@ def expire_otp():
 
         logger.info("OTP expiration check complete")
 
+    except ProgrammingError as e:
+        logger.error("OTP table missing — migrations not applied")
+        return
     except Exception as e:
         logger.error(f"Task not running....: {str(e)}", exc_info=True)
         raise e

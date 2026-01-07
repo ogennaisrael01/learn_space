@@ -55,37 +55,6 @@ class TeacherProfile(models.Model):
         user_subjects = self.subjects.split(",")
         return [subj.strip() for subj in user_subjects]
 
-class UserRoles(models.Model):
-    class RoleChoices(models.TextChoices):
-        STUDENT = "STUDENT", "student"
-        TEACHER = "TEACHER", "teacher"
-        ADMIN = "ADMIN", 'admin'
-
-
-    role_id = models.UUIDField(
-        max_length=20, 
-        primary_key=True, 
-        unique=True,
-        db_index=True,
-        default=uuid.uuid4
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="roles")
-    role = models.CharField(
-        max_length=20, 
-        choices=RoleChoices.choices, 
-        default=RoleChoices.STUDENT, 
-        db_index=True
-        )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"UserRoles({self.user.username}, {self.role})"
-
-    class Meta:
-        db_table = "roles"
-
 class Certificates(models.Model):
     certificate_id = models.UUIDField(
         max_length=20, 

@@ -3,6 +3,7 @@ from .utils.tasks import send_notification_email
 from django.conf import settings
 from rest_framework.response import Response
 from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
 
 def test_email(request):
     receiver = "ogennaisrael@gmail.com"

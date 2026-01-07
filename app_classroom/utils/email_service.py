@@ -49,4 +49,4 @@ class EmailService:
             "classroom": classroom,
             "app_name": app_name
         }
-        return subejct, context
+        return subject, context

@@ -6,6 +6,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.conf.urls.static import static
 from django.conf import settings
+from .health_check import check_django
 
 
 schema_view = get_schema_view(
@@ -29,7 +30,8 @@ urlpatterns = [
     # APIs and Routes
     path("api/v1/", include(("accounts.urls", "accounts"), namespace="accounts")),
     path("api/v1/", include("app_classroom.urls"), name="classroom"),
-    path("", include("rest_framework.urls"))
+    path("", include("rest_framework.urls")),
+    path("health", check_django, name="health")
 ]
 
 

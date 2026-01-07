@@ -67,12 +67,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     middle_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
 
+    active_role = models.CharField(max_length=200, null=True, blank=True, db_index=True)
     is_teacher = models.BooleanField(blank=True, null=True)
     is_student = models.BooleanField(blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

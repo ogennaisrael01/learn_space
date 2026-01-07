@@ -11,10 +11,12 @@ from .auth_views import (
     PasswordResetRequestView,
     PasswordResetConfirmView,
     GoogleAuthenticationView,
+    OnboardingView,
+    SwitchRoleView
 )
 from .profile_views import (
-    StudentProfileViewsets,
-    TeacherProfileViewsets,
+    ProfileBaseViewsets,
+
     CertificateViewsets,
     AvaterViewsets
 )
@@ -34,13 +36,14 @@ urlpatterns = [
     path("accounts/update/",  AccountUpdateView.as_view(), name="account-update"),
     path("auth/password/reset/request/", PasswordResetRequestView.as_view(), name="password-reset"),
     path("auth/password/reset/confirm/<token>/", PasswordResetConfirmView.as_view(), name="password-confirm"),
-    path("auth/google/", GoogleAuthenticationView.as_view(), name="goole-auth")
+    path("auth/google/", GoogleAuthenticationView.as_view(), name="goole-auth"),
+    path("auth/onboarding/", OnboardingView.as_view(), name="onboarding"),
+    path("auth/role/update/", SwitchRoleView.as_view(), name="role-switch")
 ]
 
 # profile urls
 routers = DefaultRouter()
-routers.register(r'students', StudentProfileViewsets, basename="students")
-routers.register(r"teachers", TeacherProfileViewsets, basename="teachers")
+routers.register(r'', ProfileBaseViewsets, basename="profile")
 routers.register("certificates", CertificateViewsets, basename="certificates")
 routers.register("avaters", AvaterViewsets, basename="avaters")
 

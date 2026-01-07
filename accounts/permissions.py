@@ -30,7 +30,7 @@ class IsStudent(BasePermission):
         """  
             - Only allow access to users with a student role.
         """
-        if obj.user.is_student:
+        if obj.user.active_role == "STUDENT":
             return True
         return False
 
@@ -39,7 +39,7 @@ class IsTeacher(BasePermission):
         """  
             - Only allow access to users with a teacher role.
         """
-        if obj.user.is_teacher:
+        if obj.user.active_role == "TEACHER":
             return True
         return False
     

@@ -95,7 +95,6 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
     "USER_ID_FIELD": "user_id",
     "USER_ID_CLAIM": "user_id",
-    "ALGORITHM": env("ALGORITHM"),
     "SIGNING_KEY": SECRET_KEY,
 
 }
@@ -104,7 +103,7 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1"
+        "LOCATION": "redis://redis:6379/1"
     }
 }
 

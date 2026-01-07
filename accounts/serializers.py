@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db.models import Q
-from .profile_models import UserRoles
+
 
 User = get_user_model()
 class RegistrationSerializer(serializers.Serializer):
@@ -25,11 +25,9 @@ class RegistrationSerializer(serializers.Serializer):
                                         "blank": _("Field cannot be blank")
                                      })
 
-    first_name = serializers.CharField(max_length=200)
-    middle_name = serializers.CharField(max_length=200)
-    last_name = serializers.CharField(max_length=200)
-    is_student = serializers.BooleanField()
-    is_teacher = serializers.BooleanField()
+    first_name = serializers.CharField(max_length=200, required=False)
+    last_name = serializers.CharField(max_length=200, required=False)
+    middle_name = serializers.CharField(max_length=200, required=False)
 
     def validate_password(self, value):
         """" Validate and return passwoed using the built in validation function"""
@@ -73,29 +71,13 @@ class RegistrationSerializer(serializers.Serializer):
         return username
     
     def create(self, validated_data):
-        is_teacher = validated_data.get("is_teacher")
-        is_student = validated_data.get("is_student")
         password = validated_data.get("password")
         user = User(**validated_data)
-        role = None
-        try:
-            if is_teacher:
-                role = UserRoles(user=user, role=UserRoles.RoleChoices.TEACHER)
-            elif is_student:
-                role = UserRoles(user=user, role=UserRoles.RoleChoices.STUDENT)
-        except Exception as e:
-            raise serializers.ValidationError(_(f"Errror while saving user instance: {e}"))
-        # Save user role
-        role.save()
         user.set_password(password)
         user.save()
         return user
 
     
-        
-
-        
-        return user
 
 
 class ResendOtpSerializer(serializers.Serializer):
@@ -305,3 +287,83 @@ class UserOutSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+
+
+class OnboadingSerializer(serializers.Serializer):
+    """
+    A serializer for onboarding either teachers or students
+    """
+    role_choices = ["STUDENT", "TEACHER", "BOTH"]
+    role = serializers.ChoiceField(choices=role_choices, required=True)
+
+
+    def validate_role(self, value):
+
+        if value.upper() not in self.role_choices:
+            raise serializers.ValidationError("This role is not allowed in our application")
+        return value
+    def create(self, validated_data):
+        user = self.context["request"].user
+        role = validated_data.get("role").upper()
+
+       
+        if role == self.role_choices[0]:
+            if not hasattr(user, "is_student"):
+                raise serializers.ValidationError("User dosen't have the is_student field, contact support")
+
+            setattr(user, "is_student", True)
+        elif role == self.role_choices[1]:
+            if not hasattr(user, "is_teacher"):
+                raise serializers.ValidationError("User dosen't have the is_teacher field, contact support")
+
+            setattr(user, "is_teacher", True)
+
+        elif role == self.role_choices[2]:
+            if not hasattr(user, "is_student") and not hasattr(user, "is_teacher"):
+                raise serializers.ValidationError("User is not capable of becoming both student and teacher at the same time")
+
+            setattr(user, "is_teacher", True)
+            setattr(user, "is_student", True)
+
+        else:
+            raise serializers.ValidationError("Invalid request.", code=400)
+
+        if role.upper() == self.role_choices[2]:
+            role = self.role_choices[0]
+
+        setattr(user, "active_role", role.upper())
+        user.save()
+
+        return user
+
+
+class SwitchRoleSerializer(serializers.Serializer):
+
+    role = serializers.ChoiceField(choices=["STUDENT", "TEACHER"], required=True)
+
+    def validate_role(self, value):
+        allowed_roles = ["STUDENT", "TEACHER"]
+        if value.upper() not in allowed_roles:
+            raise serializers.ValidationError("Role not in allowed roles")
+
+        user = self.context["request"].user
+
+        if user.active_role == value.upper():
+            raise serializers.ValidationErro(f"You are already in the {value} role")
+
+        return value
+
+    def create(self, validated_data):
+        role = validated_data.get("role")
+        user = self.context["request"].user
+        if hasattr(user, "active_role"):
+            setattr(user, "active_role", role.upper)
+
+        user.save(update_fields=["active_role"])
+
+        return user
+
+
+    
+
