@@ -16,9 +16,8 @@ from .auth_views import (
 )
 from .profile_views import (
     ProfileBaseViewsets,
-
     CertificateViewsets,
-    AvaterViewsets
+
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
@@ -45,7 +44,6 @@ urlpatterns = [
 routers = DefaultRouter()
 routers.register(r'', ProfileBaseViewsets, basename="profile")
 routers.register("certificates", CertificateViewsets, basename="certificates")
-routers.register("avaters", AvaterViewsets, basename="avaters")
 
 urlpatterns += [
     path("profile/", include(routers.urls), name="profiles")

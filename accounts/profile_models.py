@@ -87,7 +87,11 @@ class ProfileAvater(models.Model):
         db_index=True
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="avater")
-    avater_uri = models.ImageField(upload_to="profiles/")
+    avater_uri = models.URLField(
+        max_length=500, 
+        null=True,
+        blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

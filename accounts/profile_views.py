@@ -64,7 +64,7 @@ class ProfileBaseViewsets(viewsets.ModelViewSet):
         try:
             user_profile = get_object_or_404(
                 self.get_queryset(),
-                user=request.user
+                user=user
             )
     
             serializer = self.get_serializer(user_profile)
@@ -88,6 +88,43 @@ class ProfileBaseViewsets(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST, data={              
                         "success": False, "msg": f"Error while retrieving profile : {exc}"
                         })
+
+    @action(methods=["post", "delete"], url_path="picture", detail=False)
+    def picture_upload(self, request):
+
+        if request.method == "post":
+            serializer = AvaterSerializer(
+                request.user.avater if request.user.avater else None,
+                data=request.data,
+                partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+
+            return Response(data={
+                "detail": "profile picture updated",
+                "status": "success"
+            }, status=status.HTTP_200_OK)
+
+        elif request.method == "delete":
+            avater = request.user.avater if request.user.avater else None
+
+            if avater is None:
+                return Response(data={
+                    "detail": "profile picture object not found",
+                    "status": "failed"
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            avater.avater_uri = None
+
+            avater.save()
+
+            return Response(data={
+                "detail": "profile picture deleted",
+                "status": "success"
+            }, status=status.HTTP_200_OK)
+
+
+
 
 
 class CertificateViewsets(viewsets.ModelViewSet):
@@ -127,15 +164,4 @@ class CertificateViewsets(viewsets.ModelViewSet):
         self.perform_create(serializer)
         return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
     
-
-class AvaterViewsets(CertificateViewsets):
-    """ 
-        - Viewset for managing profile avatars.
-        - Inherits from CertificateViewsets to reuse permission and creation logic.
-        - Optimizes queryset with select_related for user data.
-    """
-    def get_queryset(self):
-        return ProfileAvater.objects.select_related("user")
-
-    serializer_class = AvaterSerializer
 
